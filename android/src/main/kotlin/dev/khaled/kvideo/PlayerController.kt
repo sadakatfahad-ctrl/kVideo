@@ -320,7 +320,7 @@ class PlayerController(
     override fun isPlayingIMA(): Boolean = player.isPlayingAd
 
     override fun skipIMAAd() {
-        // TODO
+        if (imaSdkSettings?.isInitialized() ?: false) adsLoader.skipAd()
     }
 
     fun TrackType.toExoType(): Int = when (this) {

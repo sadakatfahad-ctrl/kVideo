@@ -345,7 +345,7 @@ public class PlayerController: NSObject, FlutterPlatformView,
     }
 
     func skipIMAAd() throws {
-        // TODO
+        adsManager?.skip()
     }
 
     func playerViewDidMoveToWindow() {
@@ -463,10 +463,18 @@ extension PlayerController {
         eventHandler.listener.onIMAStatusChange(
             data: IMAEventData(
                 status: event.type.toIMAStatus(),
-                skipOffsetSecond: nil,
+                skipOffsetSecond: event.ad?.isSkippable == true
+                    ? event.ad?.skipTimeOffset
+                    : nil,
                 adTagID: event.ad?.adId,
             )
         ) { _ in }
+
+        if event.type == .LOADED,
+            pipController?.isPictureInPictureActive != true
+        {
+            adsManager.start()
+        }
     }
 
     public func adsManager(

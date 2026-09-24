@@ -16,6 +16,8 @@ import android.os.Build
 import android.os.Build.VERSION_CODES
 import android.os.IBinder
 import android.view.View
+import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.annotation.OptIn
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -212,7 +214,20 @@ private class PlayerFactory(
 @OptIn(UnstableApi::class)
 class PlayerView(val controller: PlayerController) : PlatformView {
 
-    override fun getView(): View = controller.playerView
+    private val container = FrameLayout(controller.playerView.context).apply {
+        (controller.playerView.parent as? ViewGroup)?.removeView(controller.playerView)
+        addView(
+            controller.playerView,
+            ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
+        )
+    }
 
-    override fun dispose() {}
+    override fun getView(): View = container
+
+    override fun dispose() {
+        if (controller.playerView.parent === container) container.removeView(controller.playerView)
+    }
 }
